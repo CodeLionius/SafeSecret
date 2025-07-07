@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SafeSecret - Share a Secret</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        background: #232e4a;
+        color: #fff;
+        min-height: 100vh;
+      }
+      .logo {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: #4a7cff;
+        letter-spacing: 2px;
+        text-align: center;
+      }
+      .subtitle {
+        text-align: center;
+        color: #bfc8e6;
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+      }
+      .main-card {
+        background: #2c3656;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        padding: 2.5rem 2rem 2rem 2rem;
+      }
+      .form-label {
+        color: #bfc8e6;
+        font-size: 1.3rem;
+      }
+      textarea.form-control {
+        background: #232e4a;
+        color: #fff;
+        border: 2px solid #4a7cff;
+        border-radius: 10px;
+        font-size: 1.3rem;
+        min-height: 180px;
+        margin-bottom: 2rem;
+      }
+      .pin-input {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+      }
+      .pin-box {
+        width: 48px;
+        height: 48px;
+        background: #232e4a;
+        border: 2px solid #4a7cff;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 2rem;
+        text-align: center;
+      }
+      .expire-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+      .expire-label {
+        color: #bfc8e6;
+        font-size: 1.1rem;
+        margin-bottom: 0.3rem;
+      }
+      .expire-input {
+        width: 80px;
+        background: #232e4a;
+        color: #fff;
+        border: 2px solid #4a7cff;
+        border-radius: 8px;
+        font-size: 1.2rem;
+        text-align: center;
+      }
+      .expire-select {
+        background: #232e4a;
+        color: #fff;
+        border: 2px solid #4a7cff;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        padding: 0.3rem 1rem;
+      }
+      .btn-main {
+        background: #4a7cff;
+        color: #fff;
+        font-size: 1.3rem;
+        border-radius: 10px;
+        padding: 0.8rem 0;
+        width: 100%;
+        margin-top: 1.5rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        border: none;
+        transition: background 0.2s;
+      }
+      .btn-main:hover {
+        background: #3456b3;
+      }
+      @media (max-width: 600px) {
+        .main-card { padding: 1.2rem 0.5rem; }
+        .logo { font-size: 2rem; }
+      }
+    </style>
+    <script>
+      // PIN input auto-advance and join to hidden field
+      function setupPinInput() {
+        const boxes = document.querySelectorAll('.pin-box');
+        const pinField = document.getElementById('pin');
+        boxes.forEach((box, idx) => {
+          box.addEventListener('input', function() {
+            if (this.value.length === 1 && idx < boxes.length - 1) {
+              boxes[idx + 1].focus();
+            }
+            let pin = '';
+            boxes.forEach(b => pin += b.value);
+            pinField.value = pin;
+          });
+          box.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && this.value === '' && idx > 0) {
+              boxes[idx - 1].focus();
+            }
+          });
+        });
+      }
+      window.addEventListener('DOMContentLoaded', setupPinInput);
+      // Enable Bootstrap tooltips
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+      // Enable Bootstrap popover for Expire in info
+      var expireInfo = document.getElementById('expireInfo');
+      if (expireInfo) {
+        new bootstrap.Popover(expireInfo);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container py-4">
+      <div class="logo">SafeSecret</div>
+      <div class="subtitle">A secure way to share confidential information</div>
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+          <div class="main-card">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+            <form method="post" autocomplete="off">
+              <label for="message" class="form-label">Enter text for sharing</label>
+              <textarea class="form-control" id="message" name="message" required></textarea>
+              <div class="row mt-4">
+                <div class="col-md-6">
+                  <div class="expire-label mb-2">Create PIN</div>
+                  <div class="pin-input">
+                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required>
+                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required>
+                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required>
+                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required>
+                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required>
+                  </div>
+                  <input type="hidden" name="pin" id="pin" required>
+                </div>
+                <div class="col-md-6">
+                  <div class="expire-label mb-2">Expire in</div>
+                  <div class="d-flex align-items-center" style="gap:0.5rem;">
+                    <input type="number" class="expire-input" id="exp" name="exp" min="1" max="1440" value="15" required>
+                    <select class="expire-select" name="exp_unit" id="exp_unit">
+                      <option value="minutes" selected>minutes</option>
+                      <option value="hours">hours</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-main">Generate Secure Link</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <!-- Bootstrap JS and Popper.js (required for popovers) -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+</html> 
