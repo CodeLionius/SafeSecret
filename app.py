@@ -6,9 +6,15 @@ import time
 import os
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Change in production
+# --- Security Best Practices ---
+app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))
+app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
+app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JS access to cookies
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+# --- End Security Best Practices ---
 
 # In-memory storage: {key: {enc_message, pin_hash, expire_at, read}}
+# NOTE: In-memory storage is not suitable for production scale-out or persistence.
 secrets_store = {}
 
 # Fernet key for encryption (should be kept secret in production)
@@ -33,11 +39,15 @@ def index():
         pin = request.form.get('pin', '').strip()
         exp = request.form.get('exp', '').strip()
         exp_unit = request.form.get('exp_unit', 'minutes')
+        # --- Input validation ---
         if not message or not pin or not exp.isdigit():
             flash('All fields are required and expiration must be a number.', 'danger')
             return render_template('index.html')
         if len(pin) != 5:
             flash('PIN must be 5 characters.', 'danger')
+            return render_template('index.html')
+        if len(message) > 2048:
+            flash('Message is too long (max 2048 characters).', 'danger')
             return render_template('index.html')
         exp_value = int(exp)
         if exp_unit == 'hours':
@@ -74,6 +84,7 @@ def get_secret(key):
         if not pin:
             flash('PIN is required.', 'danger')
             return render_template('enter_pin.html', key=key)
+        # --- Rate limiting: lock out after 3 attempts (already present) ---
         if secret['attempts'] >= 3:
             secrets_store.pop(key, None)
             return render_template('error.html', message='Too many incorrect attempts. Secret destroyed.')
@@ -99,6 +110,10 @@ def get_secret(key):
 def not_found(e):
     return render_template('error.html', message='Page not found.'), 404
 
+@app.errorhandler(500)
+def internal_error(e):
+    return render_template('error.html', message='An internal server error occurred.'), 500
+
 # --- Expired secret cleanup (on each request) ---
 @app.before_request
 def cleanup_expired():
@@ -106,6 +121,13 @@ def cleanup_expired():
     expired = [k for k, v in secrets_store.items() if v['expire_at'] < now or v['read']]
     for k in expired:
         secrets_store.pop(k, None)
+
+# --- Security Notes ---
+# - No logging of secrets or PINs.
+# - Always use HTTPS in production.
+# - Use environment variables for all secrets.
+# - For CSRF protection, Flask-WTF is recommended for production.
+# --- End Security Notes ---
 
 if __name__ == '__main__':
     app.run(debug=True) 

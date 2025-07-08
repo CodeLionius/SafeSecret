@@ -7,16 +7,40 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <style>
+      :root {
+        --main-bg: #232e4a;
+        --main-fg: #fff;
+        --card-bg: #2c3656;
+        --accent: #4a7cff;
+        --danger: #ff4a4a;
+        --font-size: 1rem;
+      }
+      [data-theme="dark"] {
+        --main-bg: #232e4a;
+        --main-fg: #fff;
+        --card-bg: #2c3656;
+        --accent: #4a7cff;
+      }
+      [data-theme="light"] {
+        --main-bg: #f8f9fa;
+        --main-fg: #232e4a;
+        --card-bg: #fff;
+        --accent: #4a7cff;
+      }
+      html {
+        font-size: var(--font-size);
+      }
       body {
-        background: #232e4a;
-        color: #fff;
+        background: var(--main-bg);
+        color: var(--main-fg);
         min-height: 100vh;
+        transition: background 0.2s, color 0.2s;
       }
       .logo {
         font-family: 'Montserrat', sans-serif;
         font-size: 3rem;
         font-weight: 700;
-        color: #4a7cff;
+        color: var(--accent);
         letter-spacing: 2px;
         text-align: center;
       }
@@ -27,7 +51,7 @@
         margin-bottom: 2rem;
       }
       .main-card {
-        background: #2c3656;
+        background: var(--card-bg);
         border-radius: 16px;
         box-shadow: 0 4px 24px rgba(0,0,0,0.2);
         padding: 2.5rem 2rem 2rem 2rem;
@@ -37,9 +61,9 @@
         font-size: 1.3rem;
       }
       textarea.form-control {
-        background: #232e4a;
-        color: #fff;
-        border: 2px solid #4a7cff;
+        background: var(--main-bg);
+        color: var(--main-fg);
+        border: 2px solid var(--accent);
         border-radius: 10px;
         font-size: 1.3rem;
         min-height: 180px;
@@ -51,20 +75,14 @@
         margin-bottom: 2rem;
       }
       .pin-box {
-        width: 48px;
-        height: 48px;
-        background: #232e4a;
-        border: 2px solid #4a7cff;
+        width: 56px;
+        height: 56px;
+        background: var(--main-bg);
+        border: 2px solid var(--accent);
         border-radius: 8px;
-        color: #fff;
-        font-size: 2rem;
+        color: var(--main-fg);
+        font-size: 2.2rem;
         text-align: center;
-      }
-      .expire-row {
-        display: flex;
-        align-items: flex-end;
-        gap: 2rem;
-        margin-bottom: 2rem;
       }
       .expire-label {
         color: #bfc8e6;
@@ -73,24 +91,24 @@
       }
       .expire-input {
         width: 80px;
-        background: #232e4a;
-        color: #fff;
-        border: 2px solid #4a7cff;
+        background: var(--main-bg);
+        color: var(--main-fg);
+        border: 2px solid var(--accent);
         border-radius: 8px;
         font-size: 1.2rem;
         text-align: center;
       }
       .expire-select {
-        background: #232e4a;
-        color: #fff;
-        border: 2px solid #4a7cff;
+        background: var(--main-bg);
+        color: var(--main-fg);
+        border: 2px solid var(--accent);
         border-radius: 8px;
         font-size: 1.1rem;
         padding: 0.3rem 1rem;
       }
       .btn-main {
-        background: #4a7cff;
-        color: #fff;
+        background: var(--accent);
+        color: var(--main-fg);
         font-size: 1.3rem;
         border-radius: 10px;
         padding: 0.8rem 0;
@@ -101,12 +119,51 @@
         border: none;
         transition: background 0.2s;
       }
-      .btn-main:hover {
-        background: #3456b3;
+      .btn-main:focus, .btn-main:active, .pin-box:focus, .expire-input:focus, .expire-select:focus {
+        outline: 2px solid var(--accent) !important;
+        outline-offset: 2px;
+        box-shadow: 0 0 0 2px var(--accent)33;
+      }
+      .font-size-controls {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
+      }
+      .font-size-btn {
+        background: none;
+        border: 1px solid var(--accent);
+        color: var(--main-fg);
+        border-radius: 6px;
+        width: 2.2rem;
+        height: 2.2rem;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+      }
+      .font-size-btn:focus {
+        outline: 2px solid var(--accent);
+      }
+      .theme-toggle {
+        background: none;
+        border: 1px solid var(--accent);
+        color: var(--main-fg);
+        border-radius: 6px;
+        width: 2.2rem;
+        height: 2.2rem;
+        font-size: 1.2rem;
+        cursor: pointer;
+        margin-left: 0.5rem;
+        transition: background 0.2s, color 0.2s;
+      }
+      .theme-toggle:focus {
+        outline: 2px solid var(--accent);
       }
       @media (max-width: 600px) {
         .main-card { padding: 1.2rem 0.5rem; }
         .logo { font-size: 2rem; }
+        .font-size-controls { justify-content: center; }
       }
     </style>
     <script>
@@ -130,7 +187,49 @@
           });
         });
       }
-      window.addEventListener('DOMContentLoaded', setupPinInput);
+      function updatePreview() {
+        const textarea = document.getElementById('message');
+        const charCount = document.getElementById('charCount');
+        if (textarea && charCount) {
+          const value = textarea.value;
+          charCount.textContent = value.length + (value.length === 1 ? ' character' : ' characters');
+        }
+      }
+      document.addEventListener('DOMContentLoaded', function() {
+        setupPinInput();
+        updatePreview();
+        // Font size controls
+        function setFontSize(size) {
+          document.documentElement.style.setProperty('--font-size', size + 'rem');
+          localStorage.setItem('fontSize', size);
+        }
+        function getFontSize() {
+          return parseFloat(localStorage.getItem('fontSize')) || 1;
+        }
+        document.getElementById('increase-font').onclick = function() {
+          let size = Math.min(getFontSize() + 0.1, 2);
+          setFontSize(size);
+        };
+        document.getElementById('decrease-font').onclick = function() {
+          let size = Math.max(getFontSize() - 0.1, 0.7);
+          setFontSize(size);
+        };
+        document.getElementById('reset-font').onclick = function() {
+          setFontSize(1);
+        };
+        setFontSize(getFontSize());
+        // Theme toggle
+        function setTheme(theme) {
+          document.body.setAttribute('data-theme', theme);
+          localStorage.setItem('theme', theme);
+          document.getElementById('theme-toggle').textContent = theme === 'dark' ? '🌙' : '☀️';
+        }
+        document.getElementById('theme-toggle').onclick = function() {
+          let current = document.body.getAttribute('data-theme');
+          setTheme(current === 'dark' ? 'light' : 'dark');
+        };
+        setTheme(localStorage.getItem('theme') || 'dark');
+      });
       // Enable Bootstrap tooltips
       var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
       tooltipTriggerList.forEach(function (tooltipTriggerEl) {
@@ -143,54 +242,68 @@
       }
     </script>
   </head>
-  <body>
-    <div class="container py-4">
-      <div class="logo" tabindex="0" aria-label="SafeSecret Home">SafeSecret</div>
-      <div class="subtitle">A secure way to share confidential information</div>
-      <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
-          <div class="main-card">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                {% for category, message in messages %}
-                  <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
-                {% endfor %}
-              {% endif %}
-            {% endwith %}
-            <form method="post" autocomplete="off" aria-label="Secret creation form">
-              <label for="message" class="form-label">Enter text for sharing</label>
-              <textarea class="form-control" id="message" name="message" required aria-required="true" aria-label="Secret message"></textarea>
-              <div class="row mt-4">
-                <div class="col-md-6">
-                  <div class="expire-label mb-2">Create PIN</div>
-                  <div class="pin-input" role="group" aria-label="5 character PIN input">
-                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 1">
-                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 2">
-                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 3">
-                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 4">
-                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 5">
-                  </div>
-                  <input type="hidden" name="pin" id="pin" required>
+  <body data-theme="dark">
+    <nav class="d-flex justify-content-between align-items-center mb-3" aria-label="Site controls">
+      <div></div>
+      <div class="font-size-controls" role="group" aria-label="Font size controls">
+        <button class="font-size-btn" id="decrease-font" aria-label="Decrease font size" tabindex="0">A-</button>
+        <button class="font-size-btn" id="reset-font" aria-label="Reset font size" tabindex="0">A</button>
+        <button class="font-size-btn" id="increase-font" aria-label="Increase font size" tabindex="0">A+</button>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" tabindex="0">🌙</button>
+      </div>
+    </nav>
+    <main>
+      <div class="container py-4">
+        <div class="logo" tabindex="0" aria-label="SafeSecret Home">SafeSecret</div>
+        <div class="subtitle">A secure way to share confidential information</div>
+        <div class="row justify-content-center">
+          <div class="col-lg-8 col-md-10">
+            <div class="main-card">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+              <form method="post" autocomplete="off" aria-label="Secret creation form">
+                <label for="message" class="form-label">Enter text for sharing</label>
+                <textarea class="form-control" id="message" name="message" required aria-required="true" aria-label="Secret message" oninput="updatePreview()"></textarea>
+                <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
+                  <span id="charCount" aria-live="polite" aria-atomic="true">0 characters</span>
                 </div>
-                <div class="col-md-6">
-                  <div class="expire-label mb-2">Expire in</div>
-                  <div class="d-flex align-items-center" style="gap:0.5rem;">
-                    <label for="exp" class="visually-hidden">Expiration time</label>
-                    <input type="number" class="expire-input" id="exp" name="exp" min="1" max="1440" value="15" required aria-required="true" aria-label="Expiration time">
-                    <label for="exp_unit" class="visually-hidden">Expiration unit</label>
-                    <select class="expire-select" name="exp_unit" id="exp_unit" aria-label="Expiration unit">
-                      <option value="minutes" selected>minutes</option>
-                      <option value="hours">hours</option>
-                    </select>
+                <div class="row mt-4">
+                  <div class="col-md-6">
+                    <div class="expire-label mb-2">Create PIN</div>
+                    <div class="pin-input" role="group" aria-label="5 character PIN input">
+                      <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 1" autocomplete="one-time-code">
+                      <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 2" autocomplete="one-time-code">
+                      <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 3" autocomplete="one-time-code">
+                      <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 4" autocomplete="one-time-code">
+                      <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 5" autocomplete="one-time-code">
+                    </div>
+                    <input type="hidden" name="pin" id="pin" required>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="expire-label mb-2">Expire in</div>
+                    <div class="d-flex align-items-center" style="gap:0.5rem;">
+                      <label for="exp" class="visually-hidden">Expiration time</label>
+                      <input type="number" class="expire-input" id="exp" name="exp" min="1" max="1440" value="15" required aria-required="true" aria-label="Expiration time">
+                      <label for="exp_unit" class="visually-hidden">Expiration unit</label>
+                      <select class="expire-select" name="exp_unit" id="exp_unit" aria-label="Expiration unit">
+                        <option value="minutes" selected>minutes</option>
+                        <option value="hours">hours</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <button type="submit" class="btn btn-main" aria-label="Generate Secure Link">Generate Secure Link</button>
-            </form>
+                <button type="submit" class="btn btn-main" aria-label="Generate Secure Link">Generate Secure Link</button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
     <style>
       /* Accessibility: visually hidden utility */
       .visually-hidden {
