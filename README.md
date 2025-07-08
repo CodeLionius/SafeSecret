@@ -9,6 +9,12 @@ A secure, self-destructing secret sharing web app inspired by [umputun/secrets](
 - Secrets are destroyed after being read or after expiration
 - Modern, mobile-friendly web interface
 
+## Production Deployment
+
+The app is live and available at:
+
+👉 [https://safesecret-1.onrender.com](https://safesecret-1.onrender.com)
+
 ## Setup & Installation
 
 1. **Clone the repository**
