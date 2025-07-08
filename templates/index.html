@@ -145,7 +145,7 @@
   </head>
   <body>
     <div class="container py-4">
-      <div class="logo">SafeSecret</div>
+      <div class="logo" tabindex="0" aria-label="SafeSecret Home">SafeSecret</div>
       <div class="subtitle">A secure way to share confidential information</div>
       <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
@@ -153,42 +153,79 @@
             {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
                 {% for category, message in messages %}
-                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                  <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
                 {% endfor %}
               {% endif %}
             {% endwith %}
-            <form method="post" autocomplete="off">
+            <form method="post" autocomplete="off" aria-label="Secret creation form">
               <label for="message" class="form-label">Enter text for sharing</label>
-              <textarea class="form-control" id="message" name="message" required></textarea>
+              <textarea class="form-control" id="message" name="message" required aria-required="true" aria-label="Secret message"></textarea>
               <div class="row mt-4">
                 <div class="col-md-6">
                   <div class="expire-label mb-2">Create PIN</div>
-                  <div class="pin-input">
-                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required>
-                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required>
-                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required>
-                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required>
-                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required>
+                  <div class="pin-input" role="group" aria-label="5 character PIN input">
+                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 1">
+                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 2">
+                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 3">
+                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 4">
+                    <input type="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 5">
                   </div>
                   <input type="hidden" name="pin" id="pin" required>
                 </div>
                 <div class="col-md-6">
                   <div class="expire-label mb-2">Expire in</div>
                   <div class="d-flex align-items-center" style="gap:0.5rem;">
-                    <input type="number" class="expire-input" id="exp" name="exp" min="1" max="1440" value="15" required>
-                    <select class="expire-select" name="exp_unit" id="exp_unit">
+                    <label for="exp" class="visually-hidden">Expiration time</label>
+                    <input type="number" class="expire-input" id="exp" name="exp" min="1" max="1440" value="15" required aria-required="true" aria-label="Expiration time">
+                    <label for="exp_unit" class="visually-hidden">Expiration unit</label>
+                    <select class="expire-select" name="exp_unit" id="exp_unit" aria-label="Expiration unit">
                       <option value="minutes" selected>minutes</option>
                       <option value="hours">hours</option>
                     </select>
                   </div>
                 </div>
               </div>
-              <button type="submit" class="btn btn-main">Generate Secure Link</button>
+              <button type="submit" class="btn btn-main" aria-label="Generate Secure Link">Generate Secure Link</button>
             </form>
           </div>
         </div>
       </div>
     </div>
+    <style>
+      /* Accessibility: visually hidden utility */
+      .visually-hidden {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        border: 0 !important;
+      }
+      /* Larger touch targets for mobile */
+      .pin-box, .expire-input, .expire-select, .btn-main {
+        min-height: 48px;
+      }
+      /* Improve color contrast for accessibility */
+      .main-card, textarea.form-control, .expire-input, .expire-select, .pin-box {
+        background: #232e4a !important;
+        color: #fff !important;
+        border-color: #4a7cff !important;
+      }
+      .btn-main {
+        background: #4a7cff !important;
+        color: #fff !important;
+      }
+      .btn-main:focus, .btn-main:active {
+        outline: 2px solid #3456b3 !important;
+        outline-offset: 2px;
+      }
+      .pin-box:focus, .expire-input:focus, .expire-select:focus {
+        outline: 2px solid #4a7cff !important;
+        outline-offset: 2px;
+      }
+    </style>
   </body>
   <!-- Bootstrap JS and Popper.js (required for popovers) -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>

@@ -59,7 +59,7 @@ def index():
             'attempts': 0
         }
         link = url_for('get_secret', key=key, _external=True)
-        return render_template('created.html', link=link, expire=exp_minutes)
+        return render_template('created.html', link=link, expire=exp_minutes, expire_at=expire_at)
     return render_template('index.html')
 
 @app.route('/secret/<key>', methods=['GET', 'POST'])
