@@ -85,60 +85,49 @@
           <div class="col-md-8">
             <div class="card shadow main-card">
               <div class="card-body text-center">
-                <h2 class="mb-4 d-flex align-items-center justify-content-center">
-                  <span class="me-2" style="color: #28a745; font-size: 2rem;">&#10003;</span>
-                  Secret Link Created!
-                </h2>
+                <h2 class="mb-4">Secret Link Created!</h2>
                 <p class="mb-3">
-                  The link will expire after it is viewed once or after the set time, whichever comes first.
+                  Share this link with your recipient. It will expire in <b>1752053478</b> minutes or after being read once.
                 </p>
-                {% if message %}
+                
                   <div class="alert alert-info mb-4 d-flex flex-column align-items-center">
                     <h5 class="mb-2">Secret Text:</h5>
                     <div class="w-100 mb-2">
-                      <textarea id="secret-text" class="form-control text-center" rows="3" readonly tabindex="0" style="resize:none;">{{ message }}</textarea>
+                      <textarea id="secret-text" class="form-control text-center" rows="3" readonly tabindex="0" style="resize:none;">MY_SECRET_TEXT</textarea>
                     </div>
-                    <button class="btn btn-secondary btn-sm copy-btn mt-2" id="copy-text-btn" aria-label="Copy secret text to clipboard">Copy Text</button>
-                    <div id="copy-text-feedback" class="alert alert-success py-1 px-2 mt-2 mb-0" style="display:none; font-size: 1rem;">Copied!</div>
+                    <button class="btn btn-secondary btn-sm copy-btn mt-2" id="copy-btn">Copy Text</button>
+                    <span id="copy-feedback" class="text-success mt-1" style="display:none;">Copied!</span>
                   </div>
-                {% endif %}
-                {% if file_links %}
+                
+                
                   <div class="mb-3">
                     <h5>Files:</h5>
                     <ul class="list-group mb-3">
-                      {% for file in file_links %}
+                      
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                          <span>{{ file.filename }}</span>
-                          {% if file.complete %}
-                            <a href="{{ file.link }}" class="btn btn-outline-primary btn-sm download-link" download>Download</a>
-                          {% else %}
-                            <span class="badge bg-warning text-dark">Uploading...</span>
-                          {% endif %}
+                          <span>test_secret.txt</span>
+                          
+                            <a href="http://127.0.0.1:5000/download/a8fee7e3-3a89-4e24-aa2c-b59844b950be/test_secret.txt" class="btn btn-outline-primary btn-sm" download>Download</a>
+                          
                         </li>
-                      {% endfor %}
+                      
                     </ul>
-                    {% if files_still_uploading %}
-                      <div class="alert alert-warning">Some files are still being uploaded. Please wait until upload is complete.</div>
-                    {% endif %}
+                    
                   </div>
-                {% endif %}
+                
                 <div class="mb-3">
                   <label for="share-link" class="form-label">Share this link:</label>
-                  <input type="text" class="form-control download-link" id="share-link" value="{{ share_link }}" readonly tabindex="0">
+                  <input type="text" class="form-control download-link" id="share-link" value="http://127.0.0.1:5000/combo/a8fee7e3-3a89-4e24-aa2c-b59844b950be" readonly tabindex="0">
                 </div>
                 <div class="d-flex align-items-center gap-2 mb-2">
-                  <button class="btn btn-secondary mt-2" id="copy-btn" type="button" aria-label="Copy share link to clipboard">Copy Link</button>
-                  <div id="copy-link-feedback" class="alert alert-success py-1 px-2 mt-2 mb-0" style="display:none; font-size: 1rem;">Copied!</div>
+                  <button class="btn btn-secondary mt-2" id="copy-btn" type="button">Copy Link</button>
+                  <span id="copy-feedback" class="text-success" style="display:none;">Copied!</span>
                 </div>
-                {% if expire_at %}
-                  <div class="mb-2"><span id="countdown" class="fw-bold fs-5" aria-live="polite" aria-atomic="true" style="color: #fff;"></span></div>
-                {% endif %}
-                <div class="mt-2" style="color: #ff4a4a; font-weight: 500;">
-                  <span>Note: Files will be deleted after the link expires or after being downloaded once.</span>
-                </div>
-                <div class="mt-4">
-                  <a href="/" class="btn btn-primary">Back to Home</a>
-                </div>
+                
+                  <div class="mb-2"><span id="countdown" class="fw-bold" aria-live="polite" aria-atomic="true"></span></div>
+                
+                <p class="text-muted mt-3">The decryption key is in the part after <code>#</code> in the link. The server never sees this key.</p>
+                <p class="text-danger">Files will expire after the set time or after being downloaded once.</p>
               </div>
             </div>
           </div>
@@ -287,44 +276,9 @@
             }
           });
         }
-        // Copy to clipboard for share link
-        var copyLinkBtn = document.getElementById('copy-btn');
-        var shareLink = document.getElementById('share-link');
-        var copyLinkFeedback = document.getElementById('copy-link-feedback');
-        if (copyLinkBtn && shareLink) {
-          copyLinkBtn.addEventListener('click', function() {
-            var text = shareLink.value;
-            if (navigator.clipboard && window.isSecureContext) {
-              navigator.clipboard.writeText(text).then(function() {
-                if (copyLinkFeedback) {
-                  copyLinkFeedback.style.display = 'inline';
-                  setTimeout(function() { copyLinkFeedback.style.display = 'none'; }, 1500);
-                }
-              });
-            } else {
-              shareLink.focus();
-              shareLink.select();
-              shareLink.setSelectionRange(0, 99999);
-              try {
-                var successful = document.execCommand('copy');
-                if (copyLinkFeedback) {
-                  copyLinkFeedback.style.display = 'inline';
-                  setTimeout(function() { copyLinkFeedback.style.display = 'none'; }, 1500);
-                }
-              } catch (err) {
-                if (copyLinkFeedback) {
-                  copyLinkFeedback.textContent = 'Copy failed!';
-                  copyLinkFeedback.classList.add('text-danger');
-                  copyLinkFeedback.style.display = 'inline';
-                  setTimeout(function() { copyLinkFeedback.style.display = 'none'; }, 2000);
-                }
-              }
-            }
-          });
-        }
         // Countdown timer
         var countdownEl = document.getElementById('countdown');
-        var expireAt = {{ expire_at|default(0) }} * 1000;
+        var expireAt = 1752053478 * 1000;
         function updateCountdown() {
           var now = Date.now();
           var diff = Math.max(0, Math.floor((expireAt - now) / 1000));

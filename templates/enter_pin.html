@@ -93,6 +93,79 @@
                     {% endfor %}
                   {% endif %}
                 {% endwith %}
+                {% if file_ready %}
+                  {% if message %}
+                    <div class="alert alert-info mb-4 d-flex flex-column align-items-center">
+                      <h5 class="mb-2">Secret Text:</h5>
+                      <div class="w-100 mb-2">
+                        <textarea id="secret-text" class="form-control text-center" rows="3" readonly tabindex="0" style="resize:none;">{{ message }}</textarea>
+                      </div>
+                      <button class="btn btn-secondary btn-sm copy-btn mt-2" id="copy-btn">Copy Text</button>
+                      <span id="copy-feedback" class="text-success mt-1" style="display:none;">Copied!</span>
+                    </div>
+                  {% endif %}
+                  {% if filename %}
+                    <div class="mb-3">
+                      <h5>File:</h5>
+                      <a href="{{ url_for('download_file', key=key, filename=filename) }}?download=1" class="btn btn-outline-primary btn-lg" download>Download {{ filename }}</a>
+                      <div class="alert alert-secondary mt-2">Click "Download" to save your file. File is destroyed after this view.</div>
+                    </div>
+                  {% endif %}
+                  <div class="alert alert-warning mt-3">This secret is now destroyed and cannot be viewed again.</div>
+                  <a href="/" class="btn btn-lg btn-primary mt-4 w-100">&#x2B05; Back to Home</a>
+                  <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                      var copyBtn = document.getElementById('copy-btn');
+                      var secretText = document.getElementById('secret-text');
+                      var copyFeedback = document.getElementById('copy-feedback');
+                      if (copyBtn && secretText) {
+                        copyBtn.addEventListener('click', function() {
+                          var text = secretText.value || secretText.textContent || secretText.innerText;
+                          if (navigator.clipboard && window.isSecureContext) {
+                            navigator.clipboard.writeText(text).then(function() {
+                              if (copyFeedback) {
+                                copyFeedback.textContent = 'Copied!';
+                                copyFeedback.classList.remove('text-danger');
+                                copyFeedback.classList.add('text-success');
+                                copyFeedback.style.display = 'inline';
+                                setTimeout(function() { copyFeedback.style.display = 'none'; }, 1500);
+                              }
+                            }, function() {
+                              if (copyFeedback) {
+                                copyFeedback.textContent = 'Copy failed! (Clipboard API)';
+                                copyFeedback.classList.remove('text-success');
+                                copyFeedback.classList.add('text-danger');
+                                copyFeedback.style.display = 'inline';
+                                setTimeout(function() { copyFeedback.style.display = 'none'; }, 2000);
+                              }
+                            });
+                          } else {
+                            // Fallback for older browsers
+                            secretText.focus();
+                            secretText.select();
+                            secretText.setSelectionRange(0, 99999); // For mobile devices
+                            try {
+                              var successful = document.execCommand('copy');
+                              if (copyFeedback) {
+                                if (successful) {
+                                  copyFeedback.textContent = 'Copied!';
+                                  copyFeedback.classList.remove('text-danger');
+                                  copyFeedback.classList.add('text-success');
+                                } else {
+                                  copyFeedback.textContent = 'Copy failed! (execCommand)';
+                                  copyFeedback.classList.remove('text-success');
+                                  copyFeedback.classList.add('text-danger');
+                                }
+                                copyFeedback.style.display = 'inline';
+                                setTimeout(function() { copyFeedback.style.display = 'none'; }, 2000);
+                              }
+                            } catch (err) {}
+                          }
+                        });
+                      }
+                    });
+                  </script>
+                {% else %}
                 <form method="post">
                   <div class="mb-3">
                     <label for="pin" class="form-label">PIN</label>
@@ -100,6 +173,7 @@
                   </div>
                   <button type="submit" class="btn btn-primary w-100">Show Secret</button>
                 </form>
+                {% endif %}
               </div>
             </div>
           </div>
