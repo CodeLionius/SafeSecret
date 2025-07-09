@@ -1,8 +1,9 @@
 import os
 import pytest
-from app import app, secrets_store, fernet, limiter
+from app import app, secrets_store, limiter
 import time
 import io
+
 
 @pytest.fixture
 def client():
@@ -12,9 +13,11 @@ def client():
     with app.test_client() as client:
         yield client
 
+
 # Helper to clear secrets_store between tests
 def clear_store():
     secrets_store.clear()
+
 
 # Test secret creation and retrieval
 def test_secret_lifecycle(client):
@@ -41,6 +44,7 @@ def test_secret_lifecycle(client):
     # Secret should be destroyed after read
     assert key not in secrets_store
 
+
 # Test wrong PIN and attempts
 def test_wrong_pin_attempts(client):
     clear_store()
@@ -60,6 +64,7 @@ def test_wrong_pin_attempts(client):
     assert b'Too many incorrect attempts' in resp.data
     assert key not in secrets_store
 
+
 # Test expiration
 def test_expiration(client):
     clear_store()
@@ -76,6 +81,7 @@ def test_expiration(client):
     assert b'Secret not found or expired' in resp.data or b'expired' in resp.data
     assert key not in secrets_store
 
+
 # Test PIN length validation
 def test_pin_length(client):
     clear_store()
@@ -87,6 +93,7 @@ def test_pin_length(client):
     })
     assert b'PIN must be 5 characters' in resp.data
 
+
 # Test missing fields
 def test_missing_fields(client):
     clear_store()
@@ -97,6 +104,7 @@ def test_missing_fields(client):
         'exp_unit': 'minutes'
     })
     assert b'All fields are required' in resp.data
+
 
 def test_file_upload_download(client):
     # Simulate chunked upload of a small file
@@ -137,7 +145,8 @@ def test_file_upload_download(client):
     assert resp.data  # Should return file content (encrypted)
     # After download, file should be destroyed
     resp = client.post(f'/download/{key}/{filename}', data={'pin': pin})
-    assert b'File not found or expired' in resp.data 
+    assert b'File not found or expired' in resp.data
+
 
 def test_text_only_secret(client):
     clear_store()
@@ -152,6 +161,7 @@ def test_text_only_secret(client):
     assert b'just text' in resp.data  # secret text should now be shown on created page
     assert b'Copy Link' in resp.data or b'Share this link' in resp.data
     assert b'/combo/' in resp.data  # the share link should be present
+
 
 def test_file_only_secret(client):
     clear_store()
@@ -183,6 +193,7 @@ def test_file_only_secret(client):
     assert b'file.txt' in resp.data
     assert b'Copy Link' in resp.data
     assert b'/download/' in resp.data
+
 
 def test_text_and_file_secret(client):
     clear_store()

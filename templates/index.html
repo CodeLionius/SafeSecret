@@ -161,9 +161,66 @@
         outline: 2px solid var(--accent);
       }
       @media (max-width: 600px) {
-        .main-card { padding: 1.2rem 0.5rem; }
+        .main-card { padding: 1.2rem 0.5rem; margin-bottom: 2rem; }
         .logo { font-size: 2rem; }
         .font-size-controls { justify-content: center; }
+        .alert {
+          width: 100%;
+          margin-bottom: 1rem !important;
+          font-size: 1rem;
+          box-sizing: border-box;
+        }
+        .form-label, .expire-label {
+          font-size: 1rem;
+        }
+        .pin-input {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        .pin-box {
+          width: 100%;
+          min-width: 48px;
+          max-width: 100%;
+          font-size: 1.5rem;
+        }
+        .expire-input, .expire-select {
+          width: 100%;
+          min-width: 48px;
+          font-size: 1rem;
+        }
+        .btn-main {
+          font-size: 1.1rem;
+          min-height: 48px;
+        }
+        .row, .col-lg-8, .col-md-10 {
+          margin: 0;
+          padding: 0;
+        }
+        .main-card {
+          margin-bottom: 2rem;
+        }
+        #fileList {
+          font-size: 0.95rem;
+        }
+        /* Stack PIN and Expire fields vertically on mobile */
+        .row.mt-4 {
+          flex-direction: column !important;
+        }
+        .col-md-6 {
+          width: 100% !important;
+          max-width: 100% !important;
+          flex: 0 0 100% !important;
+        }
+        .expire-label, .pin-input {
+          margin-bottom: 1rem;
+        }
+        /* Ensure Expire in is below PIN on mobile */
+        .expire-label, .d-flex.align-items-center {
+          margin-top: 0 !important;
+        }
+        .col-md-6:last-child {
+          margin-top: 0.5rem !important;
+        }
       }
     </style>
     <script>
@@ -277,8 +334,8 @@
                   <input type="file" id="fileInputFiles" name="files" multiple class="form-control mb-2">
                   <div id="fileList" class="mt-2"></div>
                 </div>
-                <div class="row mt-4">
-                  <div class="col-md-6">
+                <div class="row mt-4 flex-column flex-md-row">
+                  <div class="col-md-6 order-1 order-md-1">
                     <div class="expire-label mb-2">Create PIN</div>
                     <div class="pin-input" role="group" aria-label="5 character PIN input">
                       <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 1" autocomplete="one-time-code">
@@ -289,7 +346,7 @@
                     </div>
                     <input type="hidden" name="pin" id="pin" required>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6 order-2 order-md-2 mt-3 mt-md-0">
                     <div class="expire-label mb-2">Expire in</div>
                     <div class="d-flex align-items-center" style="gap:0.5rem;">
                       <label for="exp" class="visually-hidden">Expiration time</label>
