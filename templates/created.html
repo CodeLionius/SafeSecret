@@ -85,11 +85,11 @@
           <div class="col-md-8">
             <div class="card shadow main-card">
               <div class="card-body text-center">
-                <h2 class="mb-4 d-flex align-items-center justify-content-center">
+                <h2 class="mb-4 d-flex align-items-center justify-content-center" style="color: #fff;">
                   <span class="me-2" style="color: #28a745; font-size: 2rem;">&#10003;</span>
                   Secret Link Created!
                 </h2>
-                <p class="mb-3">
+                <p class="mb-3" style="color: #fff;">
                   The link will expire after it is viewed once or after the set time, whichever comes first.
                 </p>
                 {% if message %}
@@ -98,22 +98,17 @@
                     <div class="w-100 mb-2">
                       <textarea id="secret-text" class="form-control text-center" rows="3" readonly tabindex="0" style="resize:none;">{{ message }}</textarea>
                     </div>
-                    <button class="btn btn-secondary btn-sm copy-btn mt-2" id="copy-text-btn" aria-label="Copy secret text to clipboard">Copy Text</button>
-                    <div id="copy-text-feedback" class="alert alert-success py-1 px-2 mt-2 mb-0" style="display:none; font-size: 1rem;">Copied!</div>
+                    <!-- Copy Text button removed -->
                   </div>
                 {% endif %}
                 {% if file_links %}
                   <div class="mb-3">
-                    <h5>Files:</h5>
+                    <h5 style="color: #fff;">Files:</h5>
                     <ul class="list-group mb-3">
                       {% for file in file_links %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                           <span>{{ file.filename }}</span>
-                          {% if file.complete %}
-                            <a href="{{ file.link }}" class="btn btn-outline-primary btn-sm download-link" download>Download</a>
-                          {% else %}
-                            <span class="badge bg-warning text-dark">Uploading...</span>
-                          {% endif %}
+                          <!-- Download button removed -->
                         </li>
                       {% endfor %}
                     </ul>
@@ -123,7 +118,7 @@
                   </div>
                 {% endif %}
                 <div class="mb-3">
-                  <label for="share-link" class="form-label">Share this link:</label>
+                  <label for="share-link" class="form-label" style="color: #fff;">Share this link:</label>
                   <input type="text" class="form-control download-link" id="share-link" value="{{ share_link }}" readonly tabindex="0">
                 </div>
                 <div class="d-flex align-items-center gap-2 mb-2">
