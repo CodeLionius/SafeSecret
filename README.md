@@ -1,5 +1,4 @@
 # SafeSecret
-
 A secure, self-destructing secret and file sharing web app inspired by [umputun/secrets](https://github.com/umputun/secrets).
 
 ## Features
@@ -85,7 +84,6 @@ The app can be deployed to any standard Python environment. For a live demo, see
 - All actual templates are in the `templates/` directory.
 
 ## Credits & Inspiration
-- Inspired by [umputun/secrets](https://github.com/umputun/secrets)
 - Built with Flask, Bootstrap, and cryptography
 
 ---

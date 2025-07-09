@@ -85,7 +85,7 @@
           <div class="col-md-6">
             <div class="card shadow main-card">
               <div class="card-body">
-                <h2 class="mb-4 text-center">Enter PIN</h2>
+                <h2 class="mb-4 text-center" style="color: #fff;">Enter PIN</h2>
                 {% with messages = get_flashed_messages(with_categories=true) %}
                   {% if messages %}
                     {% for category, message in messages %}
@@ -168,7 +168,7 @@
                 {% else %}
                 <form method="post">
                   <div class="mb-3">
-                    <label for="pin" class="form-label">PIN</label>
+                    <label for="pin" class="form-label" style="color: #fff;">PIN</label>
                     <input type="text" class="form-control" id="pin" name="pin" maxlength="10" required autofocus>
                   </div>
                   <button type="submit" class="btn btn-primary w-100">Show Secret</button>
