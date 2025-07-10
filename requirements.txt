@@ -1,4 +1,4 @@
-flask_limiter
+flask-limiter
 pytest
 playwright
 Flask
