@@ -19,12 +19,16 @@
         --main-fg: #fff;
         --card-bg: #2c3656;
         --accent: #4a7cff;
+        --label-fg: #bfc8e6;
+        --success: #28a745;
       }
       [data-theme="light"] {
         --main-bg: #f8f9fa;
         --main-fg: #232e4a;
         --card-bg: #fff;
         --accent: #4a7cff;
+        --label-fg: #6c757d;
+        --success: #198754;
       }
       html {
         font-size: var(--font-size);
@@ -63,6 +67,24 @@
       .font-size-btn:focus, .theme-toggle:focus {
         outline: 2px solid var(--accent);
       }
+      .page-title {
+        color: var(--main-fg);
+      }
+      .success-icon {
+        color: var(--success);
+      }
+      .description-text {
+        color: var(--main-fg);
+      }
+      .form-label {
+        color: var(--label-fg);
+      }
+      .section-heading {
+        color: var(--main-fg);
+      }
+      .countdown-text {
+        color: var(--main-fg);
+      }
       @media (max-width: 600px) {
         .main-card { padding: 1.2rem 0.5rem; }
         .font-size-controls { justify-content: center; }
@@ -85,11 +107,11 @@
           <div class="col-md-8">
             <div class="card shadow main-card">
               <div class="card-body text-center">
-                <h2 class="mb-4 d-flex align-items-center justify-content-center" style="color: #fff;">
-                  <span class="me-2" style="color: #28a745; font-size: 2rem;">&#10003;</span>
+                <h2 class="mb-4 d-flex align-items-center justify-content-center page-title">
+                  <span class="me-2 success-icon" style="font-size: 2rem;">&#10003;</span>
                   Secret Link Created!
                 </h2>
-                <p class="mb-3" style="color: #fff;">
+                <p class="mb-3 description-text">
                   The link will expire after it is viewed once or after the set time, whichever comes first.
                 </p>
                 {% if message %}
@@ -103,7 +125,7 @@
                 {% endif %}
                 {% if file_links %}
                   <div class="mb-3">
-                    <h5 style="color: #fff;">Files:</h5>
+                    <h5 class="section-heading">Files:</h5>
                     <ul class="list-group mb-3">
                       {% for file in file_links %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -118,7 +140,7 @@
                   </div>
                 {% endif %}
                 <div class="mb-3">
-                  <label for="share-link" class="form-label" style="color: #fff;">Share this link:</label>
+                  <label for="share-link" class="form-label">Share this link:</label>
                   <input type="text" class="form-control download-link" id="share-link" value="{{ share_link }}" readonly tabindex="0">
                 </div>
                 <div class="d-flex align-items-center gap-2 mb-2">
@@ -126,7 +148,7 @@
                   <div id="copy-link-feedback" class="alert alert-success py-1 px-2 mt-2 mb-0" style="display:none; font-size: 1rem;">Copied!</div>
                 </div>
                 {% if expire_at %}
-                  <div class="mb-2"><span id="countdown" class="fw-bold fs-5" aria-live="polite" aria-atomic="true" style="color: #fff;"></span></div>
+                  <div class="mb-2"><span id="countdown" class="fw-bold fs-5 countdown-text" aria-live="polite" aria-atomic="true"></span></div>
                 {% endif %}
                 <div class="mt-2" style="color: #ff4a4a; font-weight: 500;">
                   <span>Note: Files will be deleted after the link expires or after being downloaded once.</span>
