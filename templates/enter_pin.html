@@ -63,9 +63,39 @@
       .font-size-btn:focus, .theme-toggle:focus {
         outline: 2px solid var(--accent);
       }
+      .pin-input {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        justify-content: center;
+      }
+      .pin-box {
+        width: 56px;
+        height: 56px;
+        background: var(--main-bg);
+        border: 2px solid var(--accent);
+        border-radius: 8px;
+        color: var(--main-fg);
+        font-size: 2.2rem;
+        text-align: center;
+      }
+      .pin-box:focus {
+        outline: 2px solid var(--accent) !important;
+        outline-offset: 2px;
+        box-shadow: 0 0 0 2px var(--accent)33;
+      }
       @media (max-width: 600px) {
         .main-card { padding: 1.2rem 0.5rem; }
         .font-size-controls { justify-content: center; }
+        .pin-input {
+          flex-direction: row;
+          gap: 0.3rem;
+        }
+        .pin-box {
+          width: 48px;
+          height: 48px;
+          font-size: 1.8rem;
+        }
       }
     </style>
   </head>
@@ -168,8 +198,15 @@
                 {% else %}
                 <form method="post">
                   <div class="mb-3">
-                    <label for="pin" class="form-label" style="color: #fff;">PIN</label>
-                    <input type="text" class="form-control" id="pin" name="pin" maxlength="10" required autofocus>
+                    <label class="form-label" style="color: #fff;">PIN</label>
+                    <div class="pin-input" role="group" aria-label="5 character PIN input">
+                      <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 1" autocomplete="one-time-code" autofocus>
+                      <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 2" autocomplete="one-time-code">
+                      <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 3" autocomplete="one-time-code">
+                      <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 4" autocomplete="one-time-code">
+                      <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 5" autocomplete="one-time-code">
+                    </div>
+                    <input type="hidden" name="pin" id="pin" required>
                   </div>
                   <button type="submit" class="btn btn-primary w-100">Show Secret</button>
                 </form>
@@ -181,7 +218,28 @@
       </div>
     </main>
     <script>
+      // PIN input auto-advance and join to hidden field
+      function setupPinInput() {
+        const boxes = document.querySelectorAll('.pin-box');
+        const pinField = document.getElementById('pin');
+        boxes.forEach((box, idx) => {
+          box.addEventListener('input', function() {
+            if (this.value.length === 1 && idx < boxes.length - 1) {
+              boxes[idx + 1].focus();
+            }
+            let pin = '';
+            boxes.forEach(b => pin += b.value);
+            pinField.value = pin;
+          });
+          box.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && this.value === '' && idx > 0) {
+              boxes[idx - 1].focus();
+            }
+          });
+        });
+      }
       document.addEventListener('DOMContentLoaded', function() {
+        setupPinInput();
         // Font size controls
         function setFontSize(size) {
           document.documentElement.style.setProperty('--font-size', size + 'rem');
