@@ -19,12 +19,14 @@
         --main-fg: #fff;
         --card-bg: #2c3656;
         --accent: #4a7cff;
+        --label-fg: #bfc8e6;
       }
       [data-theme="light"] {
         --main-bg: #f8f9fa;
         --main-fg: #232e4a;
         --card-bg: #fff;
         --accent: #4a7cff;
+        --label-fg: #6c757d;
       }
       html {
         font-size: var(--font-size);
@@ -84,6 +86,15 @@
         outline-offset: 2px;
         box-shadow: 0 0 0 2px var(--accent)33;
       }
+      .form-label {
+        color: var(--label-fg);
+        font-size: 1.3rem;
+      }
+      .page-title {
+        color: var(--main-fg);
+        font-size: 2rem;
+        font-weight: 600;
+      }
       @media (max-width: 600px) {
         .main-card { padding: 1.2rem 0.5rem; }
         .font-size-controls { justify-content: center; }
@@ -115,7 +126,7 @@
           <div class="col-md-6">
             <div class="card shadow main-card">
               <div class="card-body">
-                <h2 class="mb-4 text-center" style="color: #fff;">Enter PIN</h2>
+                <h2 class="mb-4 text-center page-title">Enter PIN</h2>
                 {% with messages = get_flashed_messages(with_categories=true) %}
                   {% if messages %}
                     {% for category, message in messages %}
@@ -198,7 +209,7 @@
                 {% else %}
                 <form method="post">
                   <div class="mb-3">
-                    <label class="form-label" style="color: #fff;">PIN</label>
+                    <label class="form-label">PIN</label>
                     <div class="pin-input" role="group" aria-label="5 character PIN input">
                       <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 1" autocomplete="one-time-code" autofocus>
                       <input type="tel" inputmode="text" maxlength="1" class="pin-box" pattern="[A-Za-z0-9]" required aria-label="PIN character 2" autocomplete="one-time-code">
