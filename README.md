@@ -46,7 +46,7 @@ The app can be deployed to any standard Python environment. For a live demo, see
 
 5. **Run the app**
    ```bash
-   python app.py
+   python3 app.py
    ```
    The app will be available at [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
