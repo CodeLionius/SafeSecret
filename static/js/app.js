@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
         localStorage.setItem('theme', theme);
         if (themeToggle) {
             themeToggle.innerHTML = theme === 'dark' ?
-                '<svg class="icon"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>' :
-                '<svg class="icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+                '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>' :
+                '<svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
         }
     };
 
@@ -69,9 +69,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Event Delegation for Copy Buttons
     document.addEventListener('click', function (e) {
-        if (e.target.matches('#copy-btn')) {
-            const targetId = e.target.getAttribute('data-copy-target') || 'share-link';
-            const feedbackId = e.target.getAttribute('data-copy-feedback') || 'link-feedback';
+        const copyBtn = e.target.closest('.copy-btn');
+        if (copyBtn) {
+            const targetId = copyBtn.getAttribute('data-copy-target') || 'share-link';
+            const feedbackId = copyBtn.getAttribute('data-copy-feedback') || 'link-feedback';
             copyToClipboard(targetId, feedbackId);
         }
     });
@@ -102,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
             Array.from(fileInput.files).forEach(file => {
                 const div = document.createElement('div');
                 div.className = 'mt-2 text-sm text-secondary flex items-center gap-2';
-                div.innerHTML = `<svg class="icon w-4 h-4"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg> <span>${file.name}</span>`;
+                div.innerHTML = `<svg class="icon w-4 h-4" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg> <span>${file.name}</span>`;
                 fileList.appendChild(div);
             });
         });

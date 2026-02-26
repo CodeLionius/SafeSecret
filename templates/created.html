@@ -28,7 +28,7 @@
 
         <div class="glass-card">
           <div class="mb-5">
-            <svg class="icon text-success mb-3" style="width: 48px; height: 48px;">
+            <svg class="icon text-success mb-3" style="width: 48px; height: 48px;" viewBox="0 0 24 24">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
               <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
@@ -39,8 +39,7 @@
             <label class="form-label text-start">Share this Link</label>
             <div class="position-relative">
               <input type="text" id="share-link" class="form-control pe-5" value="{{ share_link }}" readonly>
-              <button id="copy-btn"
-                class="btn btn-sm btn-outline-info position-absolute top-50 end-0 translate-middle-y m-2"
+              <button class="btn btn-sm btn-outline-info copy-btn position-absolute top-50 end-0 translate-middle-y m-2"
                 data-copy-target="share-link" data-copy-feedback="link-feedback">
                 Copy
               </button>
@@ -53,7 +52,7 @@
           <div
             class="alert alert-info bg-info bg-opacity-10 border-info border-opacity-25 text-info text-start small mb-4">
             <div class="d-flex gap-2">
-              <svg class="icon flex-shrink-0" style="width: 18px; height: 18px;">
+              <svg class="icon flex-shrink-0" style="width: 18px; height: 18px;" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="16" x2="12" y2="12" />
                 <line x1="12" y1="8" x2="12.01" y2="8" />
