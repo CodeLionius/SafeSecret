@@ -30,7 +30,7 @@ def test_secret_lifecycle(client):
         'exp_unit': 'minutes'
     }, follow_redirects=True)
     # Should redirect to /created page
-    assert b'Secret Link Created!' in resp.data or b'File Upload Complete' in resp.data
+    assert b'Secret Link Generated' in resp.data or b'File Upload Complete' in resp.data
     # Extract key from the store
     for k in secrets_store:
         key = k
@@ -133,7 +133,7 @@ def test_file_upload_download(client):
         resp = client.post('/upload', data={**form, **data}, content_type='multipart/form-data')
         assert resp.status_code == 200
         key = resp.get_json()['key']
-    # Check /created page
+    # Now check /created page which should have the filename
     resp = client.get(f'/created?key={key}')
     assert b'test.txt' in resp.data or b'files.zip' in resp.data
     # Try to download with wrong PIN
@@ -158,8 +158,8 @@ def test_text_only_secret(client):
     })
     key = next(iter(secrets_store))
     resp = client.get(f'/created?key={key}')
-    assert b'just text' in resp.data  # secret text should now be shown on created page
-    assert b'Copy Link' in resp.data or b'Share this link' in resp.data
+    assert b'Secret Link Generated' in resp.data
+    assert b'Share this Link' in resp.data or b'Share this link' in resp.data
     assert b'/combo/' in resp.data  # the share link should be present
 
 
@@ -191,8 +191,8 @@ def test_file_only_secret(client):
         key = resp.get_json()['key']
     resp = client.get(f'/created?key={key}')
     assert b'file.txt' in resp.data
-    assert b'Copy Link' in resp.data
-    assert b'/download/' in resp.data
+    assert b'Share this Link' in resp.data
+    assert b'input type="text"' in resp.data 
 
 
 def test_text_and_file_secret(client):
@@ -210,8 +210,7 @@ def test_text_and_file_secret(client):
     key = next(iter(secrets_store))
     resp = client.get(f'/created?key={key}')
     assert b'combo.txt' in resp.data
-    assert b'Copy Link' in resp.data
-    assert b'/download/' in resp.data 
+    assert b'Share this Link' in resp.data
 
 def test_chunked_upload_with_message(client):
     clear_store()

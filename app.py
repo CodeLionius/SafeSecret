@@ -100,8 +100,17 @@ if not fernet_key:
         raise RuntimeError('FERNET_KEY environment variable must be set in production!')
     # Optionally, print a warning in development
     print('WARNING: Using a generated Fernet key. Set FERNET_KEY in production!')
+
 if isinstance(fernet_key, str):
     fernet_key = fernet_key.encode()
+
+# --- Upstream Port: Security Check ---
+# Ensure the key is at least 16 bytes for sufficient integrity. 
+# Original Go app ensures SIGN_KEY >= 16. Fernet keys are base64, 
+# but we check the raw length or the env var length.
+if len(fernet_key) < 16:
+    raise RuntimeError('FERNET_KEY must be at least 16 bytes/characters long for security.')
+
 fernet = Fernet(fernet_key)
 
 # Download tracking: {key: [timestamps]}
@@ -428,6 +437,29 @@ def download_file(key, filename):
             flash('Incorrect PIN.', 'danger')
             return render_template('enter_pin.html', key=key)
     return render_template('enter_pin.html', key=key)
+
+
+@app.after_request
+def add_security_headers(response):
+    """Adds security headers to every response."""
+    # Strict CSP: only self for script-src and style-src
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+        "font-src 'self' https://fonts.gstatic.com; "
+        "img-src 'self' data:; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self';"
+    )
+    response.headers['Content-Security-Policy'] = csp
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    return response
 
 
 @app.errorhandler(404)

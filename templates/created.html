@@ -1,366 +1,75 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Secret Created</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-      :root {
-        --main-bg: #232e4a;
-        --main-fg: #fff;
-        --card-bg: #2c3656;
-        --accent: #4a7cff;
-        --danger: #ff4a4a;
-        --font-size: 1rem;
-      }
-      [data-theme="dark"] {
-        --main-bg: #232e4a;
-        --main-fg: #fff;
-        --card-bg: #2c3656;
-        --accent: #4a7cff;
-        --label-fg: #bfc8e6;
-        --success: #28a745;
-      }
-      [data-theme="light"] {
-        --main-bg: #f8f9fa;
-        --main-fg: #232e4a;
-        --card-bg: #fff;
-        --accent: #4a7cff;
-        --label-fg: #6c757d;
-        --success: #198754;
-      }
-      html {
-        font-size: var(--font-size);
-      }
-      body {
-        background: var(--main-bg);
-        color: var(--main-fg);
-        min-height: 100vh;
-        transition: background 0.2s, color 0.2s;
-      }
-      .main-card {
-        background: var(--card-bg);
-        border-radius: 16px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.2);
-        padding: 2.5rem 2rem 2rem 2rem;
-      }
-      .font-size-controls {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        justify-content: flex-end;
-        margin-bottom: 1rem;
-      }
-      .font-size-btn, .theme-toggle {
-        background: none;
-        border: 1px solid var(--accent);
-        color: var(--main-fg);
-        border-radius: 6px;
-        width: 2.2rem;
-        height: 2.2rem;
-        font-size: 1.2rem;
-        cursor: pointer;
-        margin-left: 0.5rem;
-        transition: background 0.2s, color 0.2s;
-      }
-      .font-size-btn:focus, .theme-toggle:focus {
-        outline: 2px solid var(--accent);
-      }
-      .page-title {
-        color: var(--main-fg);
-      }
-      .success-icon {
-        color: var(--success);
-      }
-      .description-text {
-        color: var(--main-fg);
-      }
-      .form-label {
-        color: var(--label-fg);
-      }
-      .section-heading {
-        color: var(--main-fg);
-      }
-      .countdown-text {
-        color: var(--main-fg);
-      }
-      @media (max-width: 600px) {
-        .main-card { padding: 1.2rem 0.5rem; }
-        .font-size-controls { justify-content: center; }
-      }
-    </style>
-  </head>
-  <body data-theme="dark">
-    <nav class="d-flex justify-content-between align-items-center mb-3" aria-label="Site controls">
-      <div></div>
-      <div class="font-size-controls" role="group" aria-label="Font size controls">
-        <button class="font-size-btn" id="decrease-font" aria-label="Decrease font size" tabindex="0">A-</button>
-        <button class="font-size-btn" id="reset-font" aria-label="Reset font size" tabindex="0">A</button>
-        <button class="font-size-btn" id="increase-font" aria-label="Increase font size" tabindex="0">A+</button>
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" tabindex="0">🌙</button>
-      </div>
-    </nav>
-    <main>
-      <div class="container py-5">
-        <div class="row justify-content-center">
-          <div class="col-md-8">
-            <div class="card shadow main-card">
-              <div class="card-body text-center">
-                <h2 class="mb-4 d-flex align-items-center justify-content-center page-title">
-                  <span class="me-2 success-icon" style="font-size: 2rem;">&#10003;</span>
-                  Secret Link Created!
-                </h2>
-                <p class="mb-3 description-text">
-                  The link will expire after it is viewed once or after the set time, whichever comes first.
-                </p>
-                {% if message %}
-                  <div class="alert alert-info mb-4 d-flex flex-column align-items-center">
-                    <h5 class="mb-2">Secret Text:</h5>
-                    <div class="w-100 mb-2">
-                      <textarea id="secret-text" class="form-control text-center" rows="3" readonly tabindex="0" style="resize:none;">{{ message }}</textarea>
-                    </div>
-                    <!-- Copy Text button removed -->
-                  </div>
-                {% endif %}
-                {% if file_links %}
-                  <div class="mb-3">
-                    <h5 class="section-heading">Files:</h5>
-                    <ul class="list-group mb-3">
-                      {% for file in file_links %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                          <span>{{ file.filename }}</span>
-                          <!-- Download button removed -->
-                        </li>
-                      {% endfor %}
-                    </ul>
-                    {% if files_still_uploading %}
-                      <div class="alert alert-warning">Some files are still being uploaded. Please wait until upload is complete.</div>
-                    {% endif %}
-                  </div>
-                {% endif %}
-                <div class="mb-3">
-                  <label for="share-link" class="form-label">Share this link:</label>
-                  <input type="text" class="form-control download-link" id="share-link" value="{{ share_link }}" readonly tabindex="0">
-                </div>
-                <div class="d-flex align-items-center gap-2 mb-2">
-                  <button class="btn btn-secondary mt-2" id="copy-btn" type="button" aria-label="Copy share link to clipboard">Copy Link</button>
-                  <div id="copy-link-feedback" class="alert alert-success py-1 px-2 mt-2 mb-0" style="display:none; font-size: 1rem;">Copied!</div>
-                </div>
-                {% if expire_at %}
-                  <div class="mb-2"><span id="countdown" class="fw-bold fs-5 countdown-text" aria-live="polite" aria-atomic="true"></span></div>
-                {% endif %}
-                <div class="mt-2" style="color: #ff4a4a; font-weight: 500;">
-                  <span>Note: Files will be deleted after the link expires or after being downloaded once.</span>
-                </div>
-                <div class="mt-4">
-                  <a href="/" class="btn btn-primary">Back to Home</a>
-                </div>
-              </div>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Link Created - SafeSecret</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/app.css') }}" rel="stylesheet">
+</head>
+
+<body data-theme="dark">
+  <nav class="container py-4 d-flex justify-content-end gap-2">
+    <button class="font-btn" id="decrease-font" aria-label="Decrease font">A-</button>
+    <button class="font-btn" id="increase-font" aria-label="Increase font">A+</button>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+  </nav>
+
+  <main class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-7 col-md-9 text-center">
+        <div class="logo">SafeSecret</div>
+        <p class="subtitle">Your secure link is ready for sharing</p>
+
+        <div class="glass-card">
+          <div class="mb-5">
+            <svg class="icon text-success mb-3" style="width: 48px; height: 48px;">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <h2 style="color: var(--text-primary); font-family: var(--font-logo);">Secret Link Generated</h2>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label text-start">Share this Link</label>
+            <div class="position-relative">
+              <input type="text" id="share-link" class="form-control pe-5" value="{{ share_link }}" readonly>
+              <button class="btn btn-sm btn-outline-info position-absolute top-50 end-0 translate-middle-y m-2"
+                onclick="copyToClipboard('share-link', 'link-feedback')">
+                Copy
+              </button>
+            </div>
+            <div id="link-feedback" class="text-success mt-2" style="display:none; font-size: 0.9rem;">
+              Link copied to clipboard!
             </div>
           </div>
+
+          <div
+            class="alert alert-info bg-info bg-opacity-10 border-info border-opacity-25 text-info text-start small mb-4">
+            <div class="d-flex gap-2">
+              <svg class="icon flex-shrink-0" style="width: 18px; height: 18px;">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              <span>Share this link and the PIN with the recipient. The secret will self-destruct once it reaches its
+                expiration time or is viewed.</span>
+            </div>
+          </div>
+
+          <a href="/" class="btn btn-primary w-100">Create Another Secret</a>
         </div>
       </div>
-    </main>
-    <script>
-      console.log('Script loaded');
-      document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM fully loaded');
-        // Font size controls
-        function setFontSize(size) {
-          document.documentElement.style.setProperty('--font-size', size + 'rem');
-          localStorage.setItem('fontSize', size);
-        }
-        function getFontSize() {
-          return parseFloat(localStorage.getItem('fontSize')) || 1;
-        }
-        document.getElementById('increase-font').onclick = function() {
-          let size = Math.min(getFontSize() + 0.1, 2);
-          setFontSize(size);
-        };
-        document.getElementById('decrease-font').onclick = function() {
-          let size = Math.max(getFontSize() - 0.1, 0.7);
-          setFontSize(size);
-        };
-        document.getElementById('reset-font').onclick = function() {
-          setFontSize(1);
-        };
-        setFontSize(getFontSize());
-        // Theme toggle
-        function setTheme(theme) {
-          document.body.setAttribute('data-theme', theme);
-          localStorage.setItem('theme', theme);
-          document.getElementById('theme-toggle').textContent = theme === 'dark' ? '🌙' : '☀️';
-        }
-        document.getElementById('theme-toggle').onclick = function() {
-          let current = document.body.getAttribute('data-theme');
-          setTheme(current === 'dark' ? 'light' : 'dark');
-        };
-        setTheme(localStorage.getItem('theme') || 'dark');
-        // Copy to clipboard functionality
-        var copyBtn = document.getElementById('copy-btn');
-        var links = document.querySelectorAll('.download-link');
-        var copyFeedback = document.getElementById('copy-feedback');
-        console.log('copyBtn:', copyBtn);
-        console.log('links:', links);
-        if (copyBtn && links.length > 0) {
-          copyBtn.addEventListener('click', function() {
-            var input = links[0];
-            var text = input.value;
-            // Try clipboard API first
-            if (navigator.clipboard && window.isSecureContext) {
-              navigator.clipboard.writeText(text).then(function() {
-                copyFeedback.textContent = 'Copied!';
-                copyFeedback.classList.remove('text-danger');
-                copyFeedback.classList.add('text-success');
-                copyFeedback.style.display = 'inline';
-                setTimeout(function() { copyFeedback.style.display = 'none'; }, 1500);
-              }, function() {
-                // Fallback: select and copy
-                input.focus();
-                input.select();
-                input.setSelectionRange(0, 99999);
-                try {
-                  var successful = document.execCommand('copy');
-                  if (successful) {
-                    copyFeedback.textContent = 'Copied!';
-                    copyFeedback.classList.remove('text-danger');
-                    copyFeedback.classList.add('text-success');
-                  } else {
-                    copyFeedback.textContent = 'Copy failed! (execCommand)';
-                    copyFeedback.classList.remove('text-success');
-                    copyFeedback.classList.add('text-danger');
-                  }
-                  copyFeedback.style.display = 'inline';
-                  setTimeout(function() { copyFeedback.style.display = 'none'; }, 1500);
-                } catch (err) {
-                  copyFeedback.textContent = 'Copy failed! (Exception)';
-                  copyFeedback.classList.remove('text-success');
-                  copyFeedback.classList.add('text-danger');
-                  copyFeedback.style.display = 'inline';
-                  setTimeout(function() { copyFeedback.style.display = 'none'; }, 2000);
-                }
-              });
-            } else {
-              // Fallback: select and copy
-              input.focus();
-              input.select();
-              input.setSelectionRange(0, 99999);
-              try {
-                var successful = document.execCommand('copy');
-                if (successful) {
-                  copyFeedback.textContent = 'Copied!';
-                  copyFeedback.classList.remove('text-danger');
-                  copyFeedback.classList.add('text-success');
-                } else {
-                  copyFeedback.textContent = 'Copy failed! (execCommand)';
-                  copyFeedback.classList.remove('text-success');
-                  copyFeedback.classList.add('text-danger');
-                }
-                copyFeedback.style.display = 'inline';
-                setTimeout(function() { copyFeedback.style.display = 'none'; }, 1500);
-              } catch (err) {
-                copyFeedback.textContent = 'Copy failed! (Exception)';
-                copyFeedback.classList.remove('text-success');
-                copyFeedback.classList.add('text-danger');
-                copyFeedback.style.display = 'inline';
-                setTimeout(function() { copyFeedback.style.display = 'none'; }, 2000);
-              }
-            }
-          });
-        }
-        // Copy to clipboard for secret text
-        var copyTextBtn = document.getElementById('copy-text-btn');
-        var secretText = document.getElementById('secret-text');
-        var copyTextFeedback = document.getElementById('copy-text-feedback');
-        if (copyTextBtn && secretText) {
-          copyTextBtn.addEventListener('click', function() {
-            var text = secretText.value || secretText.textContent || secretText.innerText;
-            if (navigator.clipboard && window.isSecureContext) {
-              navigator.clipboard.writeText(text).then(function() {
-                if (copyTextFeedback) {
-                  copyTextFeedback.style.display = 'inline';
-                  setTimeout(function() { copyTextFeedback.style.display = 'none'; }, 1500);
-                }
-              });
-            } else {
-              secretText.focus();
-              secretText.select();
-              secretText.setSelectionRange(0, 99999);
-              try {
-                var successful = document.execCommand('copy');
-                if (copyTextFeedback) {
-                  copyTextFeedback.style.display = 'inline';
-                  setTimeout(function() { copyTextFeedback.style.display = 'none'; }, 1500);
-                }
-              } catch (err) {
-                if (copyTextFeedback) {
-                  copyTextFeedback.textContent = 'Copy failed!';
-                  copyTextFeedback.classList.add('text-danger');
-                  copyTextFeedback.style.display = 'inline';
-                  setTimeout(function() { copyTextFeedback.style.display = 'none'; }, 2000);
-                }
-              }
-            }
-          });
-        }
-        // Copy to clipboard for share link
-        var copyLinkBtn = document.getElementById('copy-btn');
-        var shareLink = document.getElementById('share-link');
-        var copyLinkFeedback = document.getElementById('copy-link-feedback');
-        if (copyLinkBtn && shareLink) {
-          copyLinkBtn.addEventListener('click', function() {
-            var text = shareLink.value;
-            if (navigator.clipboard && window.isSecureContext) {
-              navigator.clipboard.writeText(text).then(function() {
-                if (copyLinkFeedback) {
-                  copyLinkFeedback.style.display = 'inline';
-                  setTimeout(function() { copyLinkFeedback.style.display = 'none'; }, 1500);
-                }
-              });
-            } else {
-              shareLink.focus();
-              shareLink.select();
-              shareLink.setSelectionRange(0, 99999);
-              try {
-                var successful = document.execCommand('copy');
-                if (copyLinkFeedback) {
-                  copyLinkFeedback.style.display = 'inline';
-                  setTimeout(function() { copyLinkFeedback.style.display = 'none'; }, 1500);
-                }
-              } catch (err) {
-                if (copyLinkFeedback) {
-                  copyLinkFeedback.textContent = 'Copy failed!';
-                  copyLinkFeedback.classList.add('text-danger');
-                  copyLinkFeedback.style.display = 'inline';
-                  setTimeout(function() { copyLinkFeedback.style.display = 'none'; }, 2000);
-                }
-              }
-            }
-          });
-        }
-        // Countdown timer
-        var countdownEl = document.getElementById('countdown');
-        var expireAt = {{ expire_at|default(0) }} * 1000;
-        function updateCountdown() {
-          var now = Date.now();
-          var diff = Math.max(0, Math.floor((expireAt - now) / 1000));
-          var min = Math.floor(diff / 60);
-          var sec = diff % 60;
-          if (diff > 0) {
-            countdownEl.textContent = 'Expires in ' + min + 'm ' + sec.toString().padStart(2, '0') + 's';
-          } else {
-            countdownEl.textContent = 'This link has expired.';
-          }
-        }
-        if (countdownEl && expireAt > 0) {
-          updateCountdown();
-          var timer = setInterval(function() {
-            updateCountdown();
-            if (Date.now() >= expireAt) clearInterval(timer);
-          }, 1000);
-        }
-      });
-    </script>
-  </body>
-</html> 
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>
