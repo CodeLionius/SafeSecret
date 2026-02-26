@@ -40,10 +40,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Unified Clipboard Handler (Upstream Port)
+    // Unified Clipboard Handler
     window.copyToClipboard = function (elementId, feedbackId) {
         const element = document.getElementById(elementId);
         const feedback = document.getElementById(feedbackId);
+        if (!element) return;
         const text = element.value || element.textContent;
 
         if (navigator.clipboard && window.isSecureContext) {
@@ -65,6 +66,32 @@ document.addEventListener('DOMContentLoaded', function () {
         el.style.display = 'inline';
         setTimeout(() => el.style.display = 'none', 2000);
     }
+
+    // Event Delegation for Copy Buttons
+    document.addEventListener('click', function (e) {
+        if (e.target.matches('#copy-btn')) {
+            const targetId = e.target.getAttribute('data-copy-target') || 'share-link';
+            const feedbackId = e.target.getAttribute('data-copy-feedback') || 'link-feedback';
+            copyToClipboard(targetId, feedbackId);
+        }
+    });
+
+    // Font Size Management
+    const setFontSize = (size) => {
+        document.documentElement.style.setProperty('--font-size', size + 'rem');
+        localStorage.setItem('fontSize', size);
+    };
+    const getFontSize = () => parseFloat(localStorage.getItem('fontSize')) || 1;
+
+    const incBtn = document.getElementById('increase-font');
+    const decBtn = document.getElementById('decrease-font');
+    const resBtn = document.getElementById('reset-font');
+
+    if (incBtn) incBtn.addEventListener('click', () => setFontSize(Math.min(getFontSize() + 0.1, 2)));
+    if (decBtn) decBtn.addEventListener('click', () => setFontSize(Math.max(getFontSize() - 0.1, 0.7)));
+    if (resBtn) resBtn.addEventListener('click', () => setFontSize(1));
+
+    setFontSize(getFontSize());
 
     // File List Preview
     const fileInput = document.getElementById('fileInputFiles');

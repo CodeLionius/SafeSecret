@@ -37,8 +37,8 @@
             <div class="position-relative">
               <textarea id="secret-text" class="form-control text-center bg-dark" rows="4" readonly
                 style="resize:none;">{{ message }}</textarea>
-              <button class="btn btn-sm btn-outline-info position-absolute top-0 end-0 m-2"
-                onclick="copyToClipboard('secret-text', 'copy-feedback')">
+              <button id="copy-btn" class="btn btn-sm btn-outline-info position-absolute top-0 end-0 m-2"
+                data-copy-target="secret-text" data-copy-feedback="copy-feedback">
                 Copy
               </button>
             </div>
